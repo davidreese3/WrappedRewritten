@@ -1,0 +1,4 @@
+my_spotify_data/Spotify Extended Streaming History/*.json
+*.txt
+/data_zips
+/my_spotify_data
