@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import time
+import seaborn as sns
 
 def main():
     start = time.time()
@@ -11,14 +12,16 @@ def main():
     #tpy = timePerYear(df)
     #mss = mostSkippedSongs(df)    
     #mlttod = mostListenedToTimeOfDay(df)
-    mltdow = mostListenedToDayOfWeek(df)
+    #mltdow = mostListenedToDayOfWeek(df)
+    mlthm = mostListenedToHeatMap(df)
     end = time.time()
     #topAlbumsPlot(ta)
     #topSongsPlot(ts)
     #timePerYearPlot(tpy)
     #mostSkippedSongsPlot(mss)
     #mostListenedToTimeOfDayPlot(mlttod)
-    mostListenedToDayOfWeekPlot(mltdow)
+    #mostListenedToDayOfWeekPlot(mltdow)
+    mostListenedToHeatMapPlotHeatMap(mlthm)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -83,6 +86,19 @@ def mostListenedToDayOfWeek(df):
     day["percent"] = day["time"]/total_playtime * 100
     return day
 
+def mostListenedToHeatMap(df):
+    df["hr"] = df["ts"].str.split("T").str[1].str.split(":").str[0]
+    df["ts"] = pd.to_datetime(df["ts"])  
+    df["weekday"] = df["ts"].dt.day_name()
+    heatMap_df = df.groupby(["hr","weekday"])["ms_played"].sum().reset_index()
+    total_playtime = heatMap_df["ms_played"].sum()
+    heatMap_df["percent"] = heatMap_df["ms_played"]/total_playtime * 100
+    
+    weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+    heatMap_df = heatMap_df.pivot(index="hr", columns="weekday", values="percent")
+    heatMap_df = heatMap_df[weekdays]
+    return heatMap_df
+
 def topAlbumsPlot(df):
     df["album_artist"] = df["album"] + " (" + df["artist"] + ")"
     plt.plot(df["album_artist"], df["hours_played"], marker="o", linestyle="-")
@@ -137,6 +153,15 @@ def mostListenedToDayOfWeekPlot(df):
     plt.ylabel("Percentage of listening")
     plt.title("Percentage of Listening at Day of Week")
     plt.xticks(rotation=45, ha="right")  
+    plt.tight_layout()
+    plt.show()
+
+def mostListenedToHeatMapPlotHeatMap(df):
+    sns.heatmap(df, cmap="viridis")
+    plt.xlabel("Day of Week")
+    plt.ylabel("Time of Day")
+    plt.title("Heatmap of Streaming")
+    plt.xticks(rotation=0)  
     plt.tight_layout()
     plt.show()
 
