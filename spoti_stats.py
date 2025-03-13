@@ -6,13 +6,13 @@ import time
 def main():
     start = time.time()
     df = setUp()
-    ta = topAlbums(df)
+    #ta = topAlbums(df)
     ts = topSongs(df)
-    tpy = timePerYear(df)
+    #tpy = timePerYear(df)
     end = time.time()
-    topAlbumsPlot(ta)
+    #topAlbumsPlot(ta)
     topSongsPlot(ts)
-    timePerYearPlot(tpy)
+    #timePerYearPlot(tpy)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -40,11 +40,12 @@ sum of the most played songs, distinguishing by artist and album to account for 
 however, it still differentiates between EP and LP versions.
 """
 def topSongs(df):
-    song = df.groupby(["master_metadata_track_name", "master_metadata_album_album_name", "master_metadata_album_artist_name"]).size().reset_index(name="times_played")
+    song = df.groupby(["master_metadata_track_name", "master_metadata_album_album_name", "master_metadata_album_artist_name"])["ms_played"].sum().div(3600000)
     song_df = song.reset_index().rename(columns={"master_metadata_track_name" : "song",
                                                  "master_metadata_album_album_name" : "album",
-                                                 "master_metadata_album_artist_name" : "artist"})
-    song_df = song_df.nlargest(10, "times_played")
+                                                 "master_metadata_album_artist_name" : "artist",
+                                                 "ms_played": "hours_played"})
+    song_df = song_df.nlargest(10, "hours_played")
     return song_df
 
 def timePerYear(df):
@@ -64,10 +65,10 @@ def topAlbumsPlot(df):
 
 def topSongsPlot(df):
     df["song_artist"] = df["song"] + " (" + df["artist"] + ")"
-    plt.plot(df["song_artist"], df["times_played"], marker="o", linestyle="-")
+    plt.plot(df["song_artist"], df["hours_played"], marker="o", linestyle="-")
     plt.xlabel("Song")
-    plt.ylabel("Times Played")
-    plt.title("Top Songs by Time Played")
+    plt.ylabel("Hours Played")
+    plt.title("Top Songs by Hours Played")
     plt.xticks(rotation=45, ha="right")  
     plt.tight_layout()
     plt.show()
