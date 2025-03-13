@@ -7,12 +7,14 @@ def main():
     start = time.time()
     df = setUp()
     #ta = topAlbums(df)
-    ts = topSongs(df)
+    #ts = topSongs(df)
     #tpy = timePerYear(df)
+    mss = mostSkippedSongs(df)    
     end = time.time()
     #topAlbumsPlot(ta)
-    topSongsPlot(ts)
+    #topSongsPlot(ts)
     #timePerYearPlot(tpy)
+    mostSkippedSongsPlot(mss)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -53,6 +55,15 @@ def timePerYear(df):
     time = df.groupby(["year"])["ms_played"].sum().div(3600000).reset_index(name="hours_played")
     return time
 
+def mostSkippedSongs(df):
+    skips = df.groupby(["skipped", "master_metadata_track_name", "master_metadata_album_album_name", "master_metadata_album_artist_name"]).size().reset_index(name="times_skipped")
+    skips_df = skips.reset_index().rename(columns={"master_metadata_track_name" : "song",
+                                                 "master_metadata_album_album_name" : "album",
+                                                 "master_metadata_album_artist_name" : "artist"})
+    skips_df = skips_df[skips_df["skipped"] != False]
+    skips_df = skips_df.nlargest(10, "times_skipped")
+    return skips_df
+
 def topAlbumsPlot(df):
     df["album_artist"] = df["album"] + " (" + df["artist"] + ")"
     plt.plot(df["album_artist"], df["hours_played"], marker="o", linestyle="-")
@@ -78,6 +89,16 @@ def timePerYearPlot(df):
     plt.xlabel("Year")
     plt.ylabel("Hours Played")
     plt.title("Hours Played Per Year")
+    plt.xticks(rotation=45, ha="right")  
+    plt.tight_layout()
+    plt.show()
+
+def mostSkippedSongsPlot(df):
+    df["song_artist"] = df["song"] + " (" + df["artist"] + ")"
+    plt.plot(df["song_artist"], df["times_skipped"], marker="o", linestyle="-")
+    plt.xlabel("Song")
+    plt.ylabel("Times Skipped")
+    plt.title("Times Skipped Per Song")
     plt.xticks(rotation=45, ha="right")  
     plt.tight_layout()
     plt.show()
