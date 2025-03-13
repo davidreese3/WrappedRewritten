@@ -10,13 +10,15 @@ def main():
     #ts = topSongs(df)
     #tpy = timePerYear(df)
     #mss = mostSkippedSongs(df)    
-    mlttod = mostListenedToTimeOfDay(df)
+    #mlttod = mostListenedToTimeOfDay(df)
+    mltdow = mostListenedToDayOfWeek(df)
     end = time.time()
     #topAlbumsPlot(ta)
     #topSongsPlot(ts)
     #timePerYearPlot(tpy)
     #mostSkippedSongsPlot(mss)
-    mostListenedToTimeOfDayPlot(mlttod)
+    #mostListenedToTimeOfDayPlot(mlttod)
+    mostListenedToDayOfWeekPlot(mltdow)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -73,6 +75,14 @@ def mostListenedToTimeOfDay(df):
     time_df["percent"] = time_df["time"]/total_playtime * 100
     return time_df
 
+def mostListenedToDayOfWeek(df):
+    df["ts"] = pd.to_datetime(df["ts"])  
+    df["weekday"] = df["ts"].dt.day_name()
+    day = df.groupby(["weekday"])["ms_played"].sum().reset_index(name="time")
+    total_playtime = day["time"].sum()
+    day["percent"] = day["time"]/total_playtime * 100
+    return day
+
 def topAlbumsPlot(df):
     df["album_artist"] = df["album"] + " (" + df["artist"] + ")"
     plt.plot(df["album_artist"], df["hours_played"], marker="o", linestyle="-")
@@ -117,6 +127,15 @@ def mostListenedToTimeOfDayPlot(df):
     plt.xlabel("Time of Day")
     plt.ylabel("Percentage of listening")
     plt.title("Percentage of Listening at Time of Day")
+    plt.xticks(rotation=45, ha="right")  
+    plt.tight_layout()
+    plt.show()
+
+def mostListenedToDayOfWeekPlot(df):
+    plt.plot(df["weekday"], df["percent"], marker="o", linestyle="-")
+    plt.xlabel("Day of Week")
+    plt.ylabel("Percentage of listening")
+    plt.title("Percentage of Listening at Day of Week")
     plt.xticks(rotation=45, ha="right")  
     plt.tight_layout()
     plt.show()
