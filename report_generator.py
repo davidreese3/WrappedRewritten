@@ -6,30 +6,48 @@ import data_visualizer as dv
 
 
 
-def generate_report(df):
+def generate_report(df, year):
     with PdfPages('report.pdf') as pdf:
         df_original = df.copy()
 
-        mpa = dp.mostPlayedAlbums(df_original.copy())
-        mps = dp.mostPlayedSongs(df_original.copy())
-        lty = dp.listeningTimeByYear(df_original.copy())
-        mst = dp.mostSkippedTracks(df_original.copy())
-        lbh = dp.listeningByHour(df_original.copy())
-        lbw = dp.listeningByWeekday(df_original.copy())
-        lh = dp.listeningHeatmap(df_original.copy())
-        t10sm = dp.top10RecurringSongsByMonth(df_original.copy(), year="2024")  
-
-        figures = [
-            dv.plotMostPlayedAlbums(mpa),
-            dv.plotMostPlayedSongs(mps),
-            dv.plotListeningTimeByYear(lty),
-            dv.plotMostSkippedTracks(mst),
-            dv.plotListeningByHour(lbh),
-            dv.plotListeningByWeekday(lbw),
-            dv.plotListeningHeatmap(lh),
-            dv.plotTop10RecurringSongsByMonth(t10sm)
-        ]
+        figures = []
         
+        mpa = dp.mostPlayedAlbums(df_original.copy())
+        if not mpa.index.empty: 
+            figures.append(dv.plotMostPlayedAlbums(mpa))
+
+        mps = dp.mostPlayedSongs(df_original.copy())
+        if not mps.index.empty: 
+            figures.append(dv.plotMostPlayedSongs(mps))
+        if year == "":
+            lty = dp.listeningTimeByYear(df_original.copy())
+            if not lty.index.empty: 
+                figures.append(dv.plotListeningTimeByYear(lty))
+
+        mst = dp.mostSkippedTracks(df_original.copy())
+        if not mst.index.empty: 
+            figures.append(dv.plotMostSkippedTracks(mst))
+
+        lbh = dp.listeningByHour(df_original.copy())
+        if not lbh.index.empty: 
+            figures.append(dv.plotListeningByHour(lbh))
+
+        lbw = dp.listeningByWeekday(df_original.copy())
+        if not lbw.index.empty: 
+            figures.append(dv.plotListeningByWeekday(lbw))
+
+        lh = dp.listeningHeatmap(df_original.copy())
+        if not lh.index.empty: 
+            figures.append(dv.plotListeningHeatmap(lh))
+
+        if year != "":
+            t10sm = dp.top10RecurringSongsByMonth(df_original.copy(), year)  
+        else :
+            t10sm = dp.top10RecurringSongsByMonth(df_original.copy())
+            
+        if not t10sm.index.empty:
+             figures.append(dv.plotTop10RecurringSongsByMonth(t10sm))
+
         for fig in figures:
             pdf.savefig(fig)
             plt.close(fig)  

@@ -54,6 +54,9 @@ def listeningByWeekday(df):
     day = df.groupby(["weekday"])["ms_played"].sum().reset_index(name="time")
     total_playtime = day["time"].sum()
     day["percent"] = day["time"]/total_playtime * 100
+    weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+    day["weekday"] = pd.Categorical(day["weekday"], categories=weekdays, ordered=True)
+    day = day.sort_values("weekday").reset_index(drop=True)
     return day
 
 def listeningHeatmap(df):
@@ -71,7 +74,7 @@ def listeningHeatmap(df):
     heatMap_df = heatMap_df[weekdays]
     return heatMap_df
 
-def top10RecurringSongsByMonth(df, year):    
+def top10RecurringSongsByMonth(df, year="2024"):    
     df["year"] = df["ts"].str.split("T").str[0].str.split("-").str[0]
     df["month"] = df["ts"].str.split("T").str[0].str.split("-").str[1]
     month_mapping = {
@@ -95,5 +98,5 @@ def top10RecurringSongsByMonth(df, year):
     filtered_dfs["rank"] = filtered_dfs.groupby("month")["play_time"].rank(ascending=False)
     pivot_df = filtered_dfs.pivot(index="song_artist", columns="month", values="rank")
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    pivot_df = pivot_df[months]
+    pivot_df = pivot_df.reindex(columns=months, fill_value=None)
     return pivot_df
