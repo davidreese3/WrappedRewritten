@@ -14,7 +14,7 @@ def main():
     #mlttod = mostListenedToTimeOfDay(df)
     #mltdow = mostListenedToDayOfWeek(df)
     #mlthm = mostListenedToHeatMap(df)
-    top10MonthToMonth(df, "2024")
+    t10mtm = top10MonthToMonth(df, "2024")
     end = time.time()
     #topAlbumsPlot(ta)
     #topSongsPlot(ts)
@@ -23,6 +23,7 @@ def main():
     #mostListenedToTimeOfDayPlot(mlttod)
     #mostListenedToDayOfWeekPlot(mltdow)
     #mostListenedToHeatMapPlotHeatMap(mlthm)
+    top10MonthToMonthPlotHeatMap(t10mtm)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -108,9 +109,11 @@ def top10MonthToMonth(df, year):
                                                   "master_metadata_album_album_name" : "album",
                                                   "master_metadata_album_artist_name" : "artist"})
     month_year_df = month_year_df[month_year_df["year"] == year] 
-    print(month_year_df)   
     monthly_dfs = month_year_df.groupby("month").apply(lambda x: x.nlargest(10, "play_time")).reset_index(drop=True)
     monthly_dfs["song_artist"] = monthly_dfs["song"] + " (" + monthly_dfs["artist"] + ")"
+    monthly_dfs["rank"] = monthly_dfs.groupby("month")["play_time"].rank(ascending=False)
+    pivot_df = monthly_dfs.pivot(index="song_artist", columns="month", values="rank")
+    return pivot_df
 
 def topAlbumsPlot(df):
     df["album_artist"] = df["album"] + " (" + df["artist"] + ")"
@@ -177,6 +180,18 @@ def mostListenedToHeatMapPlotHeatMap(df):
     plt.xticks(rotation=0)  
     plt.tight_layout()
     plt.show()
+
+
+def top10MonthToMonthPlotHeatMap(df):    
+    plt.figure(figsize=(20, 30)) 
+    sns.heatmap(df, cmap="viridis")
+    plt.xlabel("Month")
+    plt.ylabel("Song")
+    plt.title("Heatmap of Top 10 Song")
+    plt.xticks(rotation=0)  
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
     main()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
