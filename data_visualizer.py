@@ -80,7 +80,7 @@ def plotListeningByWeekday(df):
     return fig
 
 def plotListeningHeatmap(df):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(12, 8))
     sns.heatmap(df, cmap="viridis", ax=ax)
     
     ax.set_xlabel("Day of Week")
@@ -91,13 +91,13 @@ def plotListeningHeatmap(df):
     
     return fig
 
-def plotTop10SongsByMonth(df):    
-    fig, ax = plt.subplots(figsize=(20, 30))  # Set the figure size
-    sns.heatmap(df, cmap="viridis", ax=ax)
+def plotTop10RecurringSongsByMonth (df):    
+    fig, ax = plt.subplots(figsize=(10, 10)) 
+    sns.heatmap(df, cmap="viridis", ax=ax, annot=True)
     
     ax.set_xlabel("Month")
     ax.set_ylabel("Song")
-    ax.set_title("Heatmap of Top 10 Songs")
+    ax.set_title("Heatmap of Recurring Top 10 Songs")
     plt.xticks(rotation=0)  
     plt.tight_layout()
     
