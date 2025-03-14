@@ -13,7 +13,8 @@ def main():
     #mss = mostSkippedSongs(df)    
     #mlttod = mostListenedToTimeOfDay(df)
     #mltdow = mostListenedToDayOfWeek(df)
-    mlthm = mostListenedToHeatMap(df)
+    #mlthm = mostListenedToHeatMap(df)
+    top10MonthToMonth(df, "2024")
     end = time.time()
     #topAlbumsPlot(ta)
     #topSongsPlot(ts)
@@ -21,7 +22,7 @@ def main():
     #mostSkippedSongsPlot(mss)
     #mostListenedToTimeOfDayPlot(mlttod)
     #mostListenedToDayOfWeekPlot(mltdow)
-    mostListenedToHeatMapPlotHeatMap(mlthm)
+    #mostListenedToHeatMapPlotHeatMap(mlthm)
     print(f"Data calculated in: {end - start}")
 
 def setUp():
@@ -87,9 +88,9 @@ def mostListenedToDayOfWeek(df):
     return day
 
 def mostListenedToHeatMap(df):
-    df["hr"] = df["ts"].str.split("T").str[1].str.split(":").str[0]
-    df["ts"] = pd.to_datetime(df["ts"])  
-    df["weekday"] = df["ts"].dt.day_name()
+    df["ts"] = pd.to_datetime(df["ts"])    
+    df["year"] = df["ts"].dt.year
+    df["month"] = df["ts"].dt.month
     heatMap_df = df.groupby(["hr","weekday"])["ms_played"].sum().reset_index()
     total_playtime = heatMap_df["ms_played"].sum()
     heatMap_df["percent"] = heatMap_df["ms_played"]/total_playtime * 100
@@ -98,6 +99,18 @@ def mostListenedToHeatMap(df):
     heatMap_df = heatMap_df.pivot(index="hr", columns="weekday", values="percent")
     heatMap_df = heatMap_df[weekdays]
     return heatMap_df
+
+def top10MonthToMonth(df, year):
+    df["year"] = df["ts"].str.split("T").str[0].str.split("-").str[0]
+    df["month"] = df["ts"].str.split("T").str[0].str.split("-").str[1]
+    month_year_df = df.groupby(["year","month","master_metadata_track_name", "master_metadata_album_album_name", "master_metadata_album_artist_name"])["ms_played"].sum().reset_index(name="play_time")  
+    month_year_df = month_year_df.reset_index().rename(columns = { "master_metadata_track_name" : "song",
+                                                  "master_metadata_album_album_name" : "album",
+                                                  "master_metadata_album_artist_name" : "artist"})
+    month_year_df = month_year_df[month_year_df["year"] == year] 
+    print(month_year_df)   
+    monthly_dfs = month_year_df.groupby("month").apply(lambda x: x.nlargest(10, "play_time")).reset_index(drop=True)
+    monthly_dfs["song_artist"] = monthly_dfs["song"] + " (" + monthly_dfs["artist"] + ")"
 
 def topAlbumsPlot(df):
     df["album_artist"] = df["album"] + " (" + df["artist"] + ")"
