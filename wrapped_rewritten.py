@@ -17,7 +17,7 @@ def main():
     print("Please wait...")
     df = dl.load_spotify_data("my_spotify_data/Spotify Extended Streaming History", year, artist)
     start = time.time()
-    rg.generate_report(df, year)
+    rg.generate_report(df, year, artist)
     end = time.time()
     print(f"Data processed and visualized in: {end - start}")
 

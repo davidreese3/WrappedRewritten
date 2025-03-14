@@ -6,7 +6,7 @@ import data_visualizer as dv
 
 
 
-def generate_report(df, year):
+def generate_report(df, year, artist):
     with PdfPages('report.pdf') as pdf:
         df_original = df.copy()
 
@@ -19,6 +19,12 @@ def generate_report(df, year):
         mps = dp.mostPlayedSongs(df_original.copy())
         if not mps.index.empty: 
             figures.append(dv.plotMostPlayedSongs(mps))
+
+        if artist == "":
+            mpa = dp.mostPlayedArtist(df_original.copy())
+            if not mpa.index.empty: 
+                figures.append(dv.plotMostPlayedArtist(mpa))
+
         if year == "":
             lty = dp.listeningTimeByYear(df_original.copy())
             if not lty.index.empty: 
