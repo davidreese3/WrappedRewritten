@@ -17,7 +17,7 @@ def generate_report(df):
         lbh = dp.listeningByHour(df_original.copy())
         lbw = dp.listeningByWeekday(df_original.copy())
         lh = dp.listeningHeatmap(df_original.copy())
-        t10sm = dp.top10SongsByMonth(df_original.copy(), year="2024")  
+        t10sm = dp.top10RecurringSongsByMonth(df_original.copy(), year="2024")  
 
         figures = [
             dv.plotMostPlayedAlbums(mpa),
@@ -27,7 +27,7 @@ def generate_report(df):
             dv.plotListeningByHour(lbh),
             dv.plotListeningByWeekday(lbw),
             dv.plotListeningHeatmap(lh),
-            dv.plotTop10SongsByMonth(t10sm)
+            dv.plotTop10RecurringSongsByMonth(t10sm)
         ]
         
         for fig in figures:

@@ -71,9 +71,16 @@ def listeningHeatmap(df):
     heatMap_df = heatMap_df[weekdays]
     return heatMap_df
 
-def top10SongsByMonth(df, year):
+def top10RecurringSongsByMonth(df, year):    
     df["year"] = df["ts"].str.split("T").str[0].str.split("-").str[0]
     df["month"] = df["ts"].str.split("T").str[0].str.split("-").str[1]
+    month_mapping = {
+        "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr", "05": "May", "06": "Jun",
+        "07": "Jul", "08": "Aug", "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
+    }
+    df["month"] = df["month"].map(month_mapping)
+
+
     month_year_df = df.groupby(["year","month","master_metadata_track_name", "master_metadata_album_album_name", "master_metadata_album_artist_name"])["ms_played"].sum().reset_index(name="play_time")  
     month_year_df = month_year_df.reset_index().rename(columns = { "master_metadata_track_name" : "song",
                                                   "master_metadata_album_album_name" : "album",
@@ -81,6 +88,12 @@ def top10SongsByMonth(df, year):
     month_year_df = month_year_df[month_year_df["year"] == year] 
     monthly_dfs = month_year_df.groupby("month").apply(lambda x: x.nlargest(10, "play_time")).reset_index(drop=True)
     monthly_dfs["song_artist"] = monthly_dfs["song"] + " (" + monthly_dfs["artist"] + ")"
-    monthly_dfs["rank"] = monthly_dfs.groupby("month")["play_time"].rank(ascending=False)
-    pivot_df = monthly_dfs.pivot(index="song_artist", columns="month", values="rank")
+    song_counts = monthly_dfs["song_artist"].value_counts()
+
+    #filter songs that appear more than once in the top 10
+    filtered_dfs = monthly_dfs[monthly_dfs["song_artist"].isin(song_counts[song_counts > 1].index)]
+    filtered_dfs["rank"] = filtered_dfs.groupby("month")["play_time"].rank(ascending=False)
+    pivot_df = filtered_dfs.pivot(index="song_artist", columns="month", values="rank")
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    pivot_df = pivot_df[months]
     return pivot_df
