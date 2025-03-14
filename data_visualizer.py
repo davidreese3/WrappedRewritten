@@ -29,6 +29,18 @@ def plotMostPlayedSongs(df):
     
     return fig
 
+def plotMostPlayedArtist(df):   
+    fig, ax = plt.subplots()
+    ax.plot(df["artist"], df["hours_played"], marker="o", linestyle="-")
+    
+    ax.set_xlabel("Artist")
+    ax.set_ylabel("Hours Played")
+    ax.set_title("Top Artist by Hours Played")
+    plt.xticks(rotation=45, ha="right")  
+    plt.tight_layout()
+    
+    return fig
+
 def plotListeningTimeByYear(df):
     fig, ax = plt.subplots()
     ax.plot(df["year"], df["hours_played"], marker="o", linestyle="-")

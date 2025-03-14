@@ -27,6 +27,14 @@ def mostPlayedSongs(df):
     song_df = song_df.nlargest(10, "hours_played")
     return song_df
 
+def mostPlayedArtist(df):
+    artist = df.groupby(["master_metadata_album_artist_name"])["ms_played"].sum().div(3600000)
+    artist_df = artist.reset_index().rename(columns={"master_metadata_album_artist_name" : "artist",
+                                                  "ms_played": "hours_played"})
+    artist_df = artist_df.nlargest(10, "hours_played")
+    return artist_df
+
+
 def listeningTimeByYear(df):
     df["year"] = df["ts"].str.split("-").str[0]
     time = df.groupby(["year"])["ms_played"].sum().div(3600000).reset_index(name="hours_played")
