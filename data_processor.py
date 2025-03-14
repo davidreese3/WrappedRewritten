@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import time
 import seaborn as sns
+import datetime as datetime
 
 #sum of playtime of songs from each album
 def mostPlayedAlbums(df):
@@ -59,6 +60,8 @@ def listeningHeatmap(df):
     df["ts"] = pd.to_datetime(df["ts"])    
     df["year"] = df["ts"].dt.year
     df["month"] = df["ts"].dt.month
+    df["hr"] = df["ts"].dt.hour
+    df["weekday"] = df["ts"].dt.day_name()
     heatMap_df = df.groupby(["hr","weekday"])["ms_played"].sum().reset_index()
     total_playtime = heatMap_df["ms_played"].sum()
     heatMap_df["percent"] = heatMap_df["ms_played"]/total_playtime * 100
