@@ -10,7 +10,7 @@ import report_generator as rg
 import data_loader as dl
 
 def main():
-    df = dl.load_spotify_data()
+    df = dl.load_spotify_data("my_spotify_data/Spotify Extended Streaming History")
     start = time.time()
     rg.generate_report(df)
     end = time.time()

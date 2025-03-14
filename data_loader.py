@@ -1,12 +1,18 @@
 import pandas as pd
+import os
 
-def load_spotify_data():
-    file_location_prefix = "my_spotify_data/Spotify Extended Streaming History/Streaming_History_Audio_"
-    files = ["2018-2019_0","2019-2020_1","2020_2","2020_3","2020_4","2020-2021_5","2021_6","2021-2022_7",
-             "2022_8","2022_9","2022-2023_10","2023_11","2023-2024_12","2024_13","2024-2025_14"]
+def load_spotify_data(file_location):
     dataframes = []
+    files = getListOfFiles(file_location)
     for file in files:
-        df = pd.read_json(file_location_prefix + file + ".json")
+        df = pd.read_json(file_location + "/" + file)
         dataframes.append(df)
     combined_df = pd.concat(dataframes, ignore_index=True)
     return combined_df
+
+def getListOfFiles(file_location):
+        listOfFiles = [file for file in os.listdir(file_location) if os.path.isfile(os.path.join(file_location, file))]
+        listOfFilesToRemove = [file for file in listOfFiles if not("Streaming_History_Audio_" in file)]
+        for file in listOfFilesToRemove:
+             listOfFiles.remove(file)
+        return listOfFiles
