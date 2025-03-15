@@ -1,4 +1,4 @@
-# SpotiStats
+# Wrapped Rewritten
 
 One of my favorite parts of the year is Spotify Wrapped. Because I am a nerd who is into statistics and data, I am always left wanting more. This project is meant to satisfy that desire and allow me to gain more experience with Python using pandas DataFrames.
 
