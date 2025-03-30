@@ -2,7 +2,7 @@ my_spotify_data/Spotify Extended Streaming History/*.json
 *.txt
 *.pdf
 *.html
-/images/**/
+/images
 /data_zips
 /my_spotify_data
 __pycache__/

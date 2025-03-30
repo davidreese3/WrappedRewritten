@@ -42,7 +42,7 @@ def generate_report_pdf(figures):
 def generate_report_html(figures):
     html_content = "<html><head><title>Wrapped Rewritten</title></head><body>"
     html_content += "<h1>Wrapped<strong>Rewritten</strong></h1>"
-
+    os.makedirs("images", exist_ok=True)
     for i, fig in enumerate(figures):
         img_path = os.path.join("images", f"figure_{i}.png")
         fig.savefig(img_path)
